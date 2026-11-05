@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Uji Coba Rangkul</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --utama:#1E4FD8; --utama-tekan:#173FAE; --lembut:#E9F0FF; --teks:#14213D; --teks2:#4A5670;
+  --garis:#7C89A6; --garis-halus:#D6DFF2; --hijau:#0B6F52; --hijau-latar:#E0F6EE; --merah:#A3231B;
+  --bar:60px;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;min-height:100dvh;color:var(--teks);font:400 1rem/1.55 "Plus Jakarta Sans",system-ui,sans-serif;
+  background:linear-gradient(#E6EEFF,#FBFCFF 320px) no-repeat #FBFCFF}
+h1,h2,p{margin:0}
+h1{font-size:clamp(1.5rem,1.3rem + 1vw,1.875rem);line-height:1.25;font-weight:700}
+h2{font-size:1.125rem;line-height:1.35;font-weight:700}
+[hidden]{display:none!important}
+h1:focus,h2:focus{outline:none}
+:focus-visible{outline:3px solid var(--utama);outline-offset:2px}
+
+.halaman{width:min(100%,640px);margin:0 auto;padding:24px 16px 48px}
+.merek{font-weight:700;color:var(--utama);font-size:1.125rem;margin-bottom:24px}
+.kartu{background:#fff;border:1px solid var(--garis-halus);border-radius:16px;padding:20px}
+.susun>*+*{margin-top:16px}
+.kecil{font-size:.875rem;color:var(--teks2)}
+.urutan{color:var(--teks2);font-size:.875rem;font-weight:600;margin-bottom:6px}
+
+.tombol{min-height:48px;padding:10px 20px;border-radius:12px;border:1px solid transparent;font-family:inherit;font-size:1rem;font-weight:600;line-height:1.3;cursor:pointer}
+.tombol.utama{background:var(--utama);color:#fff;width:100%}
+.tombol.utama:hover{background:var(--utama-tekan)}
+.tombol.utama:disabled{background:#E1E7F3;color:#4A5670;cursor:not-allowed}
+.tombol.kedua{background:var(--lembut);color:var(--utama-tekan)}
+.tombol.kedua:hover{background:#DBE6FF}
+.tombol.kecil-t{min-height:44px;padding:8px 12px;font-size:.875rem}
+.deret{display:flex;flex-wrap:wrap;gap:8px}
+.deret>.tombol{flex:1 1 140px}
+
+/* Layar uji */
+#v-uji{height:100dvh;display:grid;grid-template-rows:var(--bar) minmax(0,1fr)}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 12px;background:#fff;border-bottom:1px solid var(--garis-halus)}
+.bar strong{font-size:.875rem;font-weight:700;white-space:nowrap}
+.bar .deret{flex-wrap:nowrap}
+.panel{display:none}
+.panggung{min-height:0;display:grid;place-items:center;padding:0}
+.ponsel{position:relative;width:min(100vw,calc((100dvh - var(--bar)) * .45));aspect-ratio:360/800;background:#fff;overflow:hidden;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+.ponsel img{display:block;width:100%;height:100%;pointer-events:none}
+.titik{position:absolute;padding:0;border:0;background:transparent;cursor:pointer;border-radius:10px;-webkit-tap-highlight-color:transparent}
+.titik:active{background:rgba(20,33,61,.08)}
+
+@media (min-width:820px){
+  #v-uji{grid-template-rows:none;grid-template-columns:minmax(300px,380px) minmax(0,1fr);gap:24px;padding:24px;max-width:1040px;margin:0 auto}
+  .bar{display:none}
+  .panel{display:block;align-self:center}
+  .ponsel{width:calc((100dvh - 48px) * .45);border-radius:12px;box-shadow:0 0 0 1px var(--garis-halus)}
+}
+
+/* Dialog */
+dialog{border:0;border-radius:16px;padding:20px;width:min(calc(100vw - 32px),420px);color:var(--teks)}
+dialog::backdrop{background:rgba(20,33,61,.55)}
+dialog>*+*{margin-top:14px}
+
+/* Pertanyaan T3 */
+label.judul{display:block;font-weight:600}
+textarea{display:block;width:100%;min-height:120px;margin-top:10px;padding:12px;border:1px solid var(--garis);border-radius:10px;font:inherit;color:inherit;background:#fff;resize:vertical}
+.salah{color:var(--merah);font-size:.875rem;font-weight:600;margin-top:8px}
+.gagal{color:var(--merah);font-weight:600}
+a.tombol{display:flex;align-items:center;justify-content:center;text-decoration:none}
+</style>
+</head>
+<body>
+
+<main id="v-mulai" class="halaman view">
+  <p class="merek">rangkul</p>
+  <div class="susun">
+    <h1 tabindex="-1">Selamat datang</h1>
+    <p>Anda akan mencoba prototipe Rangkul, aplikasi untuk guru SD, lewat lima tugas singkat lalu mengisi formulir penilaian di Google Form.</p>
+    <p>Yang diuji adalah aplikasinya, bukan Anda. Siswa dan data di dalamnya hanya contoh. Nama Anda tidak diminta.</p>
+    <p>Di setiap tugas, tekan layar seperti memakai aplikasi biasa. Waktu dan tombol yang ditekan akan tercatat. Kalau buntu, tekan Lewati.</p>
+    <p id="status-muat" class="kecil" role="status">Menyiapkan layar aplikasi...</p>
+    <button id="ulang-muat" class="tombol kedua" type="button" hidden>Muat ulang layar</button>
+    <button id="mulai" class="tombol utama" type="button" disabled>Mulai uji coba</button>
+  </div>
+</main>
+
+<main id="v-perintah" class="halaman view" hidden>
+  <p class="merek">rangkul</p>
+  <div class="kartu susun">
+    <div>
+      <p class="urutan" id="perintah-urutan"></p>
+      <h1 id="perintah-judul" tabindex="-1"></h1>
+    </div>
+    <p id="perintah-teks"></p>
+    <button id="mulai-tugas" class="tombol utama" type="button">Mulai tugas</button>
+  </div>
+</main>
+
+<div id="v-uji" class="view" hidden>
+  <header class="bar">
+    <strong id="bar-urutan"></strong>
+    <div class="deret">
+      <button class="tombol kedua kecil-t" type="button" data-aksi="lihat">Perintah</button>
+      <button class="tombol kedua kecil-t" type="button" data-aksi="akhiri" data-label-akhiri>Lewati</button>
+    </div>
+  </header>
+  <aside class="panel kartu susun">
+    <div>
+      <p class="urutan" id="panel-urutan"></p>
+      <h2 id="panel-judul"></h2>
+    </div>
+    <p id="panel-teks"></p>
+    <button class="tombol kedua" type="button" data-aksi="akhiri" data-label-akhiri>Lewati tugas</button>
+  </aside>
+  <div class="panggung">
+    <div class="ponsel" id="ponsel"><img id="layar" alt="" src="data:,"></div>
+  </div>
+</div>
+
+<main id="v-tanya" class="halaman view" hidden>
+  <p class="merek">rangkul</p>
+  <form id="form-tanya" class="kartu susun" novalidate>
+    <label class="judul" for="t3-jawaban"><span id="t3-judul" tabindex="-1">Tanda apa yang membaik pada Siswa A, dan berapa strategi yang berhasil?</span></label>
+    <textarea id="t3-jawaban" maxlength="500" aria-describedby="t3-salah"></textarea>
+    <p id="t3-salah" class="salah" hidden>Tulis jawaban Anda dulu.</p>
+    <button class="tombol utama" type="submit">Lanjut</button>
+  </form>
+</main>
+
+<main id="v-selesai" class="halaman view" hidden>
+  <p class="merek">rangkul</p>
+  <div class="susun">
+    <h1 tabindex="-1">Semua tugas selesai</h1>
+    <p role="status">Sebentar lagi formulir penilaian di Google Form terbuka. Dua kolom terakhir di formulir sudah terisi otomatis, biarkan saja.</p>
+    <a id="ke-form" class="tombol utama" href="#">Buka formulir penilaian</a>
+  </div>
+</main>
+
+<dialog id="d-perintah" aria-labelledby="d-perintah-judul">
+  <h2 id="d-perintah-judul"></h2>
+  <p id="d-perintah-teks"></p>
+  <button class="tombol utama" type="button" data-tutup>Kembali ke tugas</button>
+</dialog>
+
+<dialog id="d-lewati" aria-labelledby="d-lewati-judul">
+  <h2 id="d-lewati-judul">Lewati tugas ini?</h2>
+  <p>Tugas ini akan tercatat belum selesai, dan Anda lanjut ke tahap berikutnya.</p>
+  <div class="deret">
+    <button class="tombol kedua" type="button" data-tutup>Kembali ke tugas</button>
+    <button id="ya-lewati" class="tombol utama" type="button">Ya, lewati</button>
+  </div>
+</dialog>
+
+<dialog id="d-berhasil" aria-labelledby="d-berhasil-judul">
+  <h2 id="d-berhasil-judul"></h2>
+  <p>Terima kasih. Tekan Lanjut untuk ke tahap berikutnya.</p>
+  <button id="lanjut-tugas" class="tombol utama" type="button">Lanjut</button>
+</dialog>
+
+<script>
+"use strict";
+
+const TUGAS = [
+  {kode:"T1", judul:"Catat observasi", teks:"Catat bahwa Siswa A di kelas 2B sering tertukar huruf b/d hari ini.", mulai:"05", tujuan:"08a"},
+  {kode:"T2", judul:"Pilih saran akomodasi", teks:"Lihat saran akomodasi untuk Siswa A, lalu pilih satu untuk dicoba minggu ini.", mulai:"09", tujuan:"10a"},
+  {kode:"T3", judul:"Lihat perkembangan", teks:"Lihat perkembangan Siswa A. Perhatikan tanda yang membaik dan jumlah strategi yang berhasil. Setelah itu, tekan Selesai dan jawab pertanyaan berikutnya.", mulai:"11", tujuan:null},
+  {kode:"T4", judul:"Buat laporan orang tua", teks:"Buat laporan ringkas untuk orang tua Siswa A. Orang tua sudah setuju laporan ini dibagikan.", mulai:"11", tujuan:"12"},
+  // Layar 07 juga bisa dicapai lewat menu bawah, jadi T5 baru berhasil bila datang dari layar 14.
+  {kode:"T5", judul:"Susun bahan rujukan", teks:"Susun bahan rujukan untuk Siswa A, lalu catat bahwa orang tua sudah setuju.", mulai:"13", tujuan:"07", lewat:"14"}
+];
+
+const NAMA = {"04":"Masuk","05":"Beranda","06":"Daftar Siswa","07":"Profil Siswa","08":"Catat Observasi","08a":"Catatan Tersimpan","09":"Saran Akomodasi","09a":"Saran Dimuat","10":"Detail Strategi","10a":"Strategi Dimulai","11":"Perkembangan dan Rekap Mingguan","12":"Laporan untuk Orang Tua","12a":"Laporan Belum Disetujui","13":"Bahan Rujukan","13a":"Laporan Dibagikan","14":"Tindak Lanjut Orang Tua","15":"Pustaka Akomodasi","16":"Belajar Singkat","17":"Daftar Layanan","18":"Akun dan Privasi"};
+
+const KEMBALI = [15,55,55,55,"<","Kembali"];
+const MENU = [
+  [0,712,72,68,"05","Beranda"],[72,712,72,68,"06","Kelas Saya"],[144,712,72,68,"15","Pustaka"],
+  [216,712,72,68,"13","Rujukan"],[288,712,72,68,"18","Akun"]
+];
+const SIMPAN_BAWAH = (ke,label)=>[20,700,320,70,ke,label];
+const LANJUT_RUJUK = [20,640,320,65,"14","Lanjut ke tindak lanjut"];
+const LIHAT_LAYANAN = [15,400,150,60,"17","Lihat daftar layanan"];
+
+// Area tekan dalam piksel bingkai Figma 360x800: [x, y, lebar, tinggi, tujuan, label]. "<" berarti kembali ke layar sebelumnya.
+const TITIK = {
+  "04":[[19,490,320,60,"05","Masuk"]],
+  "05":[[20,640,320,65,"08","Catat observasi"],[20,254,320,58,"07","Siswa A"],[20,316,320,58,"07","Siswa C"],[20,378,320,57,"07","Siswa D"],[255,445,90,60,"06","Lihat kelas"],...MENU],
+  "06":[[20,198,320,57,"07","Siswa C"],[20,265,320,55,"07","Siswa A"],[20,329,320,58,"07","Siswa D"],[20,396,320,78,"07","Siswa B"],[20,483,320,55,"07","Siswa E"],[20,548,320,54,"07","Siswa F"],...MENU],
+  "07":[KEMBALI,[35,325,290,65,"08","Catat observasi"],[20,505,320,46,"09","Saran akomodasi"],[20,558,320,47,"11","Perkembangan"],[20,610,320,46,"12a","Laporan untuk orang tua"],[20,662,320,46,"13","Bahan rujukan"]],
+  "08":[KEMBALI,SIMPAN_BAWAH("08a","Simpan catatan")],
+  "08a":[],
+  "09":[KEMBALI,[36,410,288,62,"10","Lihat langkah"]],
+  "09a":[],
+  "10":[KEMBALI,SIMPAN_BAWAH("10a","Coba strategi ini")],
+  "10a":[],
+  "11":[KEMBALI,SIMPAN_BAWAH("12a","Buat laporan")],
+  "12":[KEMBALI,SIMPAN_BAWAH("13a","Bagikan lewat WhatsApp")],
+  "12a":[KEMBALI,[20,445,300,60,"12","Orang tua sudah menyetujui berbagi laporan"]],
+  "13":[LANJUT_RUJUK,LIHAT_LAYANAN,...MENU],
+  "13a":[LANJUT_RUJUK,LIHAT_LAYANAN,...MENU],
+  "14":[KEMBALI,SIMPAN_BAWAH("07","Simpan status")],
+  "15":[[20,185,320,55,"10","Potong tugas menjadi bagian kecil"],[20,525,320,48,"16","Belajar singkat"],...MENU],
+  "16":[KEMBALI],
+  "17":[KEMBALI],
+  "18":[[20,385,320,65,"04","Keluar"],...MENU]
+};
+
+// Perpindahan otomatis seperti After delay di Figma.
+const OTOMATIS = {"08a":[1500,"09a"],"09a":[1500,"09"],"10a":[2000,"11"]};
+const JEDA_TUJUAN = 1200;
+
+const $ = id => document.getElementById(id);
+// Kode entry berasal dari link pre-filled hasil buat-google-form.gs. Kalau Form dibuat ulang, kode ini ikut berubah.
+const FORM = "https://docs.google.com/forms/d/e/1FAIpQLSdFcBsGCZml8Opts_YE6jMSTi2TFvRRm9RBagB9ZDyF3R1zOQ/viewform?usp=pp_url";
+const ENTRY_T3 = "entry.638066163", ENTRY_DATA = "entry.1129338041";
+const JEDA_FORM = 2500, BATAS_JALUR = 30;
+const hasil = {
+  id: "R-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2,6),
+  perangkat: null, tugas: {}, t3_jawaban: ""
+};
+
+let nomor = 0, kini = null, riwayat = [], t0 = 0, klik = 0, salahKlik = 0, jalur = [], timer = null, tugasAktif = false;
+
+function tampil(id, fokus){
+  document.querySelectorAll(".view").forEach(v => { v.hidden = v.id !== id; });
+  window.scrollTo(0,0);
+  if (fokus) $(fokus).focus({preventScroll:true});
+  else { const h = $(id).querySelector("h1,h2"); if (h) h.focus({preventScroll:true}); }
+}
+
+function muatGambar(){
+  const kode = Object.keys(NAMA);
+  const status = $("status-muat");
+  let siap = 0, gagal = 0;
+  $("ulang-muat").hidden = true;
+  status.textContent = "Menyiapkan layar aplikasi...";
+  status.className = "kecil";
+  kode.forEach(k => {
+    const im = new Image();
+    im.onload = () => { siap++; lapor(); };
+    im.onerror = () => { gagal++; lapor(); };
+    im.src = "layar/" + k + ".png";
+  });
+  function lapor(){
+    if (siap + gagal < kode.length) { status.textContent = `Menyiapkan layar aplikasi: ${siap + gagal} dari ${kode.length}.`; return; }
+    if (gagal) {
+      status.textContent = `${gagal} layar gagal dimuat. Periksa koneksi, lalu muat ulang.`;
+      status.className = "gagal";
+      $("ulang-muat").hidden = false;
+      return;
+    }
+    status.textContent = "Layar sudah siap.";
+    $("mulai").disabled = false;
+  }
+}
+
+function tampilPerintah(){
+  const t = TUGAS[nomor];
+  $("perintah-urutan").textContent = `Tugas ${nomor+1} dari ${TUGAS.length}`;
+  $("perintah-judul").textContent = t.judul;
+  $("perintah-teks").textContent = t.teks;
+  tampil("v-perintah");
+}
+
+function mulaiTugas(){
+  const t = TUGAS[nomor], urutan = `Tugas ${nomor+1} dari ${TUGAS.length}`;
+  $("bar-urutan").textContent = urutan;
+  $("panel-urutan").textContent = urutan;
+  $("panel-judul").textContent = t.judul;
+  $("panel-teks").textContent = t.teks;
+  $("d-perintah-judul").textContent = t.judul;
+  $("d-perintah-teks").textContent = t.teks;
+  const bebas = !t.tujuan;
+  document.querySelectorAll("[data-label-akhiri]").forEach(b => {
+    b.textContent = bebas ? "Selesai" : (b.closest(".bar") ? "Lewati" : "Lewati tugas");
+  });
+  riwayat = []; klik = 0; salahKlik = 0; jalur = []; tugasAktif = true;
+  tampil("v-uji");
+  buka(t.mulai, false);
+  t0 = performance.now();
+}
+
+function buka(ke, simpanRiwayat){
+  clearTimeout(timer);
+  const asal = kini;
+  if (simpanRiwayat && asal) riwayat.push(asal === "13a" ? "13" : asal);
+  kini = ke;
+  jalur.push(ke);
+  $("layar").src = "layar/" + ke + ".png";
+  $("layar").alt = "Layar " + NAMA[ke];
+  gambarTitik(ke);
+  const t = TUGAS[nomor];
+  if (tugasAktif && t.tujuan === ke && (!t.lewat || t.lewat === asal)) { selesaikan("berhasil"); return; }
+  const oto = OTOMATIS[ke];
+  if (oto) timer = setTimeout(() => buka(oto[1], false), oto[0]);
+}
+
+function gambarTitik(k){
+  const p = $("ponsel");
+  p.querySelectorAll(".titik").forEach(b => b.remove());
+  (TITIK[k] || []).forEach(([x,y,w,h,ke,label]) => {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "titik"; b.setAttribute("aria-label", label);
+    b.style.cssText = `left:${x/3.6}%;top:${y/8}%;width:${w/3.6}%;height:${h/8}%`;
+    b.addEventListener("click", ev => {
+      ev.stopPropagation();
+      if (!tugasAktif) return;
+      klik++;
+      if (ke === "<") { if (riwayat.length) { const asal = riwayat.pop(); buka(asal, false); } return; }
+      buka(ke, ke !== kini);
+    });
+    p.appendChild(b);
+  });
+}
+
+function selesaikan(status){
+  if (!tugasAktif) return;
+  tugasAktif = false;
+  clearTimeout(timer);
+  const t = TUGAS[nomor];
+  hasil.tugas[t.kode] = {status, detik: Math.round((performance.now()-t0)/100)/10, klik, salah_klik: salahKlik, jalur: jalur.slice(0,BATAS_JALUR).join("-") + (jalur.length > BATAS_JALUR ? "-dst" : "")};
+  if (status === "berhasil") {
+    timer = setTimeout(() => {
+      $("d-berhasil-judul").textContent = `Tugas ${nomor+1} selesai`;
+      $("d-berhasil").showModal();
+    }, JEDA_TUJUAN);
+  } else lanjut();
+}
+
+function lanjut(){
+  const t = TUGAS[nomor];
+  if (t.kode === "T3") { tampil("v-tanya", "t3-judul"); return; }
+  nomor++;
+  if (nomor < TUGAS.length) tampilPerintah(); else keForm();
+}
+
+function dataTugas(){
+  const bagian = [`ID ${hasil.id}`, `Perangkat ${hasil.perangkat}`];
+  TUGAS.forEach(t => {
+    const r = hasil.tugas[t.kode];
+    bagian.push(`${t.kode} ${r.status}, ${r.detik} detik, ${r.klik} klik, ${r.salah_klik} salah klik, ${r.jalur}`);
+  });
+  return bagian.join("; ");
+}
+
+function keForm(){
+  const url = `${FORM}&${ENTRY_T3}=${encodeURIComponent(hasil.t3_jawaban)}&${ENTRY_DATA}=${encodeURIComponent(dataTugas())}`;
+  $("ke-form").href = url;
+  tampil("v-selesai");
+  setTimeout(() => location.assign(url), JEDA_FORM);
+}
+
+$("mulai").addEventListener("click", () => {
+  hasil.perangkat = innerWidth < 820 ? "HP atau tablet" : "Laptop atau komputer";
+  tampilPerintah();
+});
+$("ulang-muat").addEventListener("click", muatGambar);
+$("mulai-tugas").addEventListener("click", mulaiTugas);
+$("ponsel").addEventListener("click", () => { if (tugasAktif) { klik++; salahKlik++; } });
+document.querySelectorAll("[data-aksi=lihat]").forEach(b => b.addEventListener("click", () => $("d-perintah").showModal()));
+document.querySelectorAll("[data-aksi=akhiri]").forEach(b => b.addEventListener("click", () => {
+  if (TUGAS[nomor].tujuan) $("d-lewati").showModal(); else selesaikan("selesai");
+}));
+document.querySelectorAll("[data-tutup]").forEach(b => b.addEventListener("click", () => b.closest("dialog").close()));
+$("ya-lewati").addEventListener("click", () => { $("d-lewati").close(); selesaikan("dilewati"); });
+$("lanjut-tugas").addEventListener("click", () => { $("d-berhasil").close(); lanjut(); });
+$("d-berhasil").addEventListener("cancel", ev => ev.preventDefault());
+$("form-tanya").addEventListener("submit", ev => {
+  ev.preventDefault();
+  const j = $("t3-jawaban").value.trim();
+  $("t3-salah").hidden = !!j;
+  if (!j) { $("t3-jawaban").focus(); return; }
+  hasil.t3_jawaban = j;
+  nomor++;
+  tampilPerintah();
+});
+muatGambar();
+</script>
+</body>
+</html>
