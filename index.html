@@ -48,7 +48,14 @@ h1:focus,h2:focus{outline:none}
 .bar .deret{flex-wrap:nowrap}
 .panel{display:none}
 .panggung{min-height:0;display:grid;place-items:center;padding:0}
+.sorot{position:absolute;border:3px solid #C2410C;border-radius:12px;pointer-events:none}
+.sorot span{position:absolute;top:-12px;right:-6px;display:flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:#C2410C;color:#fff;font-size:.8125rem;font-weight:700}
 .ponsel{position:relative;width:min(100vw,calc((100dvh - var(--bar)) * .45));aspect-ratio:360/800;background:#fff;overflow:hidden;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+.tanya{display:grid;gap:16px;width:min(100%,640px);margin:0 auto;padding:24px 16px 48px;grid-template-areas:"arah" "layar" "isian"}
+.tanya .arah{grid-area:arah}
+.tanya form{grid-area:isian}
+.layar-baca{grid-area:layar;position:relative;width:min(100%,320px);margin:0 auto;aspect-ratio:360/800}
+.layar-baca img{display:block;width:100%;height:100%}
 .ponsel img{display:block;width:100%;height:100%;pointer-events:none}
 .titik{position:absolute;padding:0;border:0;background:transparent;cursor:pointer;border-radius:10px;-webkit-tap-highlight-color:transparent}
 .titik:active{background:rgba(20,33,61,.08)}
@@ -57,6 +64,8 @@ h1:focus,h2:focus{outline:none}
   #v-uji{grid-template-rows:none;grid-template-columns:minmax(300px,380px) minmax(0,1fr);gap:24px;padding:24px;max-width:1040px;margin:0 auto}
   .bar{display:none}
   .panel{display:block;align-self:center}
+  .tanya{width:min(100%,1040px);min-height:100dvh;padding:24px;gap:16px 24px;grid-template-columns:minmax(300px,380px) auto;grid-template-rows:1fr auto auto 1fr;grid-template-areas:". layar" "arah layar" "isian layar" ". layar";justify-content:center}
+  .layar-baca{width:calc((100dvh - 48px) * .45);margin:0;border-radius:12px;overflow:hidden;box-shadow:0 0 0 1px var(--garis-halus)}
   .ponsel{width:calc((100dvh - 48px) * .45);border-radius:12px;box-shadow:0 0 0 1px var(--garis-halus)}
 }
 
@@ -105,7 +114,7 @@ a.tombol{display:flex;align-items:center;justify-content:center;text-decoration:
     <strong id="bar-urutan"></strong>
     <div class="deret">
       <button class="tombol kedua kecil-t" type="button" data-aksi="lihat">Perintah</button>
-      <button class="tombol kedua kecil-t" type="button" data-aksi="akhiri" data-label-akhiri>Lewati</button>
+      <button class="tombol kedua kecil-t" type="button" data-aksi="akhiri">Lewati</button>
     </div>
   </header>
   <aside class="panel kartu susun">
@@ -114,17 +123,21 @@ a.tombol{display:flex;align-items:center;justify-content:center;text-decoration:
       <h2 id="panel-judul"></h2>
     </div>
     <p id="panel-teks"></p>
-    <button class="tombol kedua" type="button" data-aksi="akhiri" data-label-akhiri>Lewati tugas</button>
+    <button class="tombol kedua" type="button" data-aksi="akhiri">Lewati tugas</button>
   </aside>
   <div class="panggung">
     <div class="ponsel" id="ponsel"><img id="layar" alt="" src="data:,"></div>
   </div>
 </div>
 
-<main id="v-tanya" class="halaman view" hidden>
-  <p class="merek">rangkul</p>
+<main id="v-tanya" class="tanya view" hidden>
+  <div class="arah">
+    <h1 tabindex="-1">Baca dua kotak oranye</h1>
+    <p style="margin-top:8px">Baca kotak 1 dan 2 pada layar, lalu jawab pertanyaannya.</p>
+  </div>
+  <div class="layar-baca" id="layar-baca"><img src="layar/11.png" alt="Layar Perkembangan Siswa A dengan dua kotak oranye: kartu Sulit fokus dan daftar strategi yang berhasil."></div>
   <form id="form-tanya" class="kartu susun" novalidate>
-    <label class="judul" for="t3-jawaban"><span id="t3-judul" tabindex="-1">Tanda apa yang membaik pada Siswa A, dan berapa strategi yang berhasil?</span></label>
+    <label class="judul" for="t3-jawaban">Tanda apa yang membaik pada Siswa A, dan berapa strategi yang berhasil?</label>
     <textarea id="t3-jawaban" maxlength="500" aria-describedby="t3-salah"></textarea>
     <p id="t3-salah" class="salah" hidden>Tulis jawaban Anda dulu.</p>
     <button class="tombol utama" type="submit">Lanjut</button>
@@ -167,7 +180,7 @@ a.tombol{display:flex;align-items:center;justify-content:center;text-decoration:
 const TUGAS = [
   {kode:"T1", judul:"Catat observasi", teks:"Catat bahwa Siswa A di kelas 2B sering tertukar huruf b/d hari ini.", mulai:"05", tujuan:"08a"},
   {kode:"T2", judul:"Pilih saran akomodasi", teks:"Lihat saran akomodasi untuk Siswa A, lalu pilih satu untuk dicoba minggu ini.", mulai:"09", tujuan:"10a"},
-  {kode:"T3", judul:"Lihat perkembangan", teks:"Lihat perkembangan Siswa A. Perhatikan tanda yang membaik dan jumlah strategi yang berhasil. Setelah itu, tekan Selesai dan jawab pertanyaan berikutnya.", mulai:"11", tujuan:null},
+  {kode:"T3", judul:"Lihat perkembangan", teks:"Buka halaman perkembangan Siswa A. Tugas selesai otomatis saat halamannya terbuka, lalu Anda menjawab satu pertanyaan.", mulai:"07", tujuan:"11", baca:[[16,174,328,176],[12,498,336,92]]},
   {kode:"T4", judul:"Buat laporan orang tua", teks:"Buat laporan ringkas untuk orang tua Siswa A. Orang tua sudah setuju laporan ini dibagikan.", mulai:"11", tujuan:"12"},
   // Layar 07 juga bisa dicapai lewat menu bawah, jadi T5 baru berhasil bila datang dari layar 14.
   {kode:"T5", judul:"Susun bahan rujukan", teks:"Susun bahan rujukan untuk Siswa A, lalu catat bahwa orang tua sudah setuju.", mulai:"13", tujuan:"07", lewat:"14"}
@@ -273,10 +286,6 @@ function mulaiTugas(){
   $("panel-teks").textContent = t.teks;
   $("d-perintah-judul").textContent = t.judul;
   $("d-perintah-teks").textContent = t.teks;
-  const bebas = !t.tujuan;
-  document.querySelectorAll("[data-label-akhiri]").forEach(b => {
-    b.textContent = bebas ? "Selesai" : (b.closest(".bar") ? "Lewati" : "Lewati tugas");
-  });
   riwayat = []; klik = 0; salahKlik = 0; jalur = []; tugasAktif = true;
   tampil("v-uji");
   buka(t.mulai, false);
@@ -332,9 +341,20 @@ function selesaikan(status){
 
 function lanjut(){
   const t = TUGAS[nomor];
-  if (t.kode === "T3") { tampil("v-tanya", "t3-judul"); return; }
+  if (t.baca) { tampilBaca(t.baca); return; }
   nomor++;
   if (nomor < TUGAS.length) tampilPerintah(); else keForm();
+}
+
+function tampilBaca(kotak){
+  kotak.forEach(([x,y,w,h],i) => {
+    const s = document.createElement("div");
+    s.className = "sorot"; s.setAttribute("aria-hidden","true");
+    s.style.cssText = `left:${x/3.6}%;top:${y/8}%;width:${w/3.6}%;height:${h/8}%`;
+    s.innerHTML = `<span>${i+1}</span>`;
+    $("layar-baca").appendChild(s);
+  });
+  tampil("v-tanya");
 }
 
 function dataTugas(){
@@ -362,7 +382,7 @@ $("mulai-tugas").addEventListener("click", mulaiTugas);
 $("ponsel").addEventListener("click", () => { if (tugasAktif) { klik++; salahKlik++; } });
 document.querySelectorAll("[data-aksi=lihat]").forEach(b => b.addEventListener("click", () => $("d-perintah").showModal()));
 document.querySelectorAll("[data-aksi=akhiri]").forEach(b => b.addEventListener("click", () => {
-  if (TUGAS[nomor].tujuan) $("d-lewati").showModal(); else selesaikan("selesai");
+  $("d-lewati").showModal();
 }));
 document.querySelectorAll("[data-tutup]").forEach(b => b.addEventListener("click", () => b.closest("dialog").close()));
 $("ya-lewati").addEventListener("click", () => { $("d-lewati").close(); selesaikan("dilewati"); });
